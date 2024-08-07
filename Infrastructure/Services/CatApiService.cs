@@ -17,16 +17,12 @@ namespace Infrastructure.Services
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
         private readonly string _apiKey;
-        private readonly int _limit;
-        private readonly int _hasBreeds;
 
         public CatApiService(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _baseUrl = configuration["CatApi:BaseUrl"];
             _apiKey = configuration["CatApi:ApiKey"];
-            _limit = int.Parse(configuration["CatApi:Limit"]);
-            _hasBreeds = int.Parse(configuration["CatApi:HasBreeds"]);
         }
 
         //public CatApiService(HttpClient httpClient, IConfiguration configuration)
@@ -38,13 +34,13 @@ namespace Infrastructure.Services
         //}
 
       
-            public async Task<List<CatEntity>> FetchCatImagesAsync(int limit = 25, int page = 0, string order = "RAND", int hasBreeds = 1, string breedIds = null, string categoryIds = null, string subId = null)
+            public async Task<List<CatEntity>> FetchCatImagesAsync(int limit = 25,  int hasBreeds = 1)
             {
             // Construct the query parameters
             var queryParams = new List<string>
             {
-                $"limit={_limit}",
-                $"has_breeds={_hasBreeds}",
+                $"limit={limit}",
+                $"has_breeds={hasBreeds}",
                 $"api_key={_apiKey}"
             };
 
@@ -54,14 +50,7 @@ namespace Infrastructure.Services
 
             var result = new List<CatEntity>();
 
-
-
-            //var queryString = string.Join("&", queryParams);
-            //var response = await _httpClient.GetStringAsync(_apiUrl);
-            //   var response = await _httpClient.GetStringAsync($"{_baseUrl}/images/search?{queryString}&api_key={_apiKey}");
-            // var catList = JArray.Parse(response).ToObject<List<JObject>>();
-
-            //  var result = new List<CatEntity>();
+        
             foreach (var jObject in catList)
             {
                 var cat = new CatEntity

@@ -9,6 +9,6 @@ namespace Core.Interfaces
 {
     public  interface ICatApiService
     {
-        Task<List<CatEntity>> FetchCatImagesAsync(int limit = 25, int page = 0, string order = "RAND", int hasBreeds = 1, string breedIds = null, string categoryIds = null, string subId = null);
+        Task<List<CatEntity>> FetchCatImagesAsync(int limit = 25,  int hasBreeds = 1);
     }
 }

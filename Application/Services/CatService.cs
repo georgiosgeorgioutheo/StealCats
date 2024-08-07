@@ -19,9 +19,9 @@ namespace Application.Services
             _catApiService = catApiService;
         }
 
-        public async Task FetchAndStoreCatsAsync(int limit = 25, int page = 0, string order = "RAND", int hasBreeds = 1, string breedIds = null, string categoryIds = null, string subId = null)
+        public async Task FetchAndStoreCatsAsync(int limit = 25, int hasBreeds = 1 )
         {
-            var cats = await _catApiService.FetchCatImagesAsync(limit, page, order, hasBreeds, breedIds, categoryIds, subId);
+            var cats = await _catApiService.FetchCatImagesAsync(limit,  hasBreeds);
             await _catRepository.AddCatsAsync(cats);
         }
 

@@ -49,36 +49,63 @@ namespace Infrastructure.Repositories
         {
             foreach (var cat in cats)
             {
-                if (!_context.Cats.Any(c => c.CatId == cat.CatId))
+                var existingCat = await _context.Cats
+                    .Include(c => c.CatTags).ThenInclude(ct => ct.Tag)
+                    .FirstOrDefaultAsync(c => c.CatId == cat.CatId);
+
+                if (existingCat == null)
                 {
                     cat.Created = DateTime.UtcNow;
 
-                    // Add tags and relations
                     foreach (var catTag in cat.CatTags)
                     {
                         var existingTag = await _context.Tags
                             .FirstOrDefaultAsync(t => t.Name == catTag.Tag.Name);
+
                         if (existingTag == null)
                         {
                             _context.Tags.Add(catTag.Tag);
+                            await _context.SaveChangesAsync(); // Save changes to get the ID
                         }
                         else
                         {
-                            catTag.TagId = existingTag.Id; // Use existing tag ID
+                            catTag.Tag = existingTag;
+                            catTag.TagId = existingTag.Id;
                         }
-
-                        _context.CatTags.Add(new CatTagEntity
-                        {
-                            Cat = cat,
-                            Tag = existingTag ?? catTag.Tag
-                        });
                     }
 
                     _context.Cats.Add(cat);
                 }
+                else
+                {
+                    // Attach new tags to existing cat
+                    foreach (var catTag in cat.CatTags)
+                    {
+                        var existingTag = await _context.Tags
+                            .FirstOrDefaultAsync(t => t.Name == catTag.Tag.Name);
+
+                        if (existingTag == null)
+                        {
+                            _context.Tags.Add(catTag.Tag);
+                            await _context.SaveChangesAsync();
+                            existingTag = catTag.Tag;
+                        }
+
+                        if (!existingCat.CatTags.Any(ct => ct.TagId == existingTag.Id))
+                        {
+                            _context.CatTags.Add(new CatTagEntity
+                            {
+                                CatId = existingCat.Id,
+                                TagId = existingTag.Id
+                            });
+                        }
+                    }
+                }
             }
+
             await _context.SaveChangesAsync();
         }
+
     }
 }
 

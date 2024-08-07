@@ -18,9 +18,9 @@ namespace StealCats.Controllers
             }
 
             [HttpPost("fetch")]
-             public async Task<IActionResult> FetchCats([FromQuery] int limit = 25, [FromQuery] int page = 0, [FromQuery] string order = "RAND", [FromQuery] int hasBreeds = 1, [FromQuery] string breedIds = null, [FromQuery] string categoryIds = null, [FromQuery] string subId = null)
+             public async Task<IActionResult> FetchCats([FromQuery] int limit = 25,  [FromQuery] int hasBreeds = 1  )
             {
-                await _catService.FetchAndStoreCatsAsync(limit, page, order, hasBreeds, breedIds, categoryIds, subId);
+                await _catService.FetchAndStoreCatsAsync(limit, hasBreeds);
                 return Ok();
             }
 
