@@ -32,12 +32,12 @@ namespace StealCats.Controllers
                 return Ok(cat);
             }
 
-            [HttpGet]
-            public async Task<IActionResult> GetCats(int page = 1, int pageSize = 10)
-            {
-                var cats = await _catService.GetCatsAsync(page, pageSize);
-                return Ok(cats);
-            }
+            //[HttpGet]
+            //public async Task<IActionResult> GetCats(int page = 1, int pageSize = 10)
+            //{
+            //    var cats = await _catService.GetCatsAsync(page, pageSize);
+            //    return Ok(cats);
+            //}
 
             [HttpGet("tag")]
             public async Task<IActionResult> GetCatsByTag(string tag, int page = 1, int pageSize = 10)

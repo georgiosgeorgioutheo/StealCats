@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core.Interfaces
 {
-    public  interface ICatApiService
+    public  interface IStealCatApiService
     {
         Task<List<CatEntity>> FetchCatImagesAsync(int limit = 25,  int hasBreeds = 1);
     }

@@ -11,17 +11,17 @@ namespace Application.Services
     public class CatService
     {
         private readonly ICatRepository _catRepository;
-        private readonly ICatApiService _catApiService;
+        private readonly IStealCatApiService _stealCatApiService;
 
-        public CatService(ICatRepository catRepository, ICatApiService catApiService)
+        public CatService(ICatRepository catRepository, IStealCatApiService catApiService)
         {
             _catRepository = catRepository;
-            _catApiService = catApiService;
+            _stealCatApiService = catApiService;
         }
 
         public async Task FetchAndStoreCatsAsync(int limit = 25, int hasBreeds = 1 )
         {
-            var cats = await _catApiService.FetchCatImagesAsync(limit,  hasBreeds);
+            var cats = await _stealCatApiService.FetchCatImagesAsync(limit,  hasBreeds);
             await _catRepository.AddCatsAsync(cats);
         }
 

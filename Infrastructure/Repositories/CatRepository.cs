@@ -55,55 +55,42 @@ namespace Infrastructure.Repositories
 
                 if (existingCat == null)
                 {
-                    cat.Created = DateTime.UtcNow;
-
-                    foreach (var catTag in cat.CatTags)
-                    {
-                        var existingTag = await _context.Tags
-                            .FirstOrDefaultAsync(t => t.Name == catTag.Tag.Name);
-
-                        if (existingTag == null)
-                        {
-                            _context.Tags.Add(catTag.Tag);
-                            await _context.SaveChangesAsync(); // Save changes to get the ID
-                        }
-                        else
-                        {
-                            catTag.Tag = existingTag;
-                            catTag.TagId = existingTag.Id;
-                        }
-                    }
-
-                    _context.Cats.Add(cat);
-                }
-                else
-                {
-                    // Attach new tags to existing cat
-                    foreach (var catTag in cat.CatTags)
-                    {
-                        var existingTag = await _context.Tags
-                            .FirstOrDefaultAsync(t => t.Name == catTag.Tag.Name);
-
-                        if (existingTag == null)
-                        {
-                            _context.Tags.Add(catTag.Tag);
-                            await _context.SaveChangesAsync();
-                            existingTag = catTag.Tag;
-                        }
-
-                        if (!existingCat.CatTags.Any(ct => ct.TagId == existingTag.Id))
-                        {
-                            _context.CatTags.Add(new CatTagEntity
-                            {
-                                CatId = existingCat.Id,
-                                TagId = existingTag.Id
-                            });
-                        }
-                    }
+                    await AddNewCatAsync(cat);
                 }
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        private async Task AddNewCatAsync(CatEntity cat)
+        {
+            cat.Created = DateTime.UtcNow;
+
+            foreach (var catTag in cat.CatTags)
+            {
+                await CheckAndAddTagAsync(catTag);
+            }
+
+            _context.Cats.Add(cat);
+        }
+
+       
+
+        private async Task CheckAndAddTagAsync(CatTagEntity catTag)
+        {
+            var existingTag = await _context.Tags
+                .FirstOrDefaultAsync(t => t.Name == catTag.Tag.Name);
+
+            if (existingTag == null)
+            {
+                _context.Tags.Add(catTag.Tag);
+                await _context.SaveChangesAsync(); // Save changes to get the ID
+            }
+            else
+            {
+                catTag.Tag = existingTag;
+                catTag.TagId = existingTag.Id;
+            }
         }
 
     }
