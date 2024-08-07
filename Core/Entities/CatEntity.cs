@@ -16,4 +16,5 @@ namespace Core.Entities
         public DateTime Created { get; set; }
         public List<CatTagEntity> CatTags { get; set; }
     }
+       
 }

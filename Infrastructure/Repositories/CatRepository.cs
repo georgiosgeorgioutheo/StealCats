@@ -52,6 +52,28 @@ namespace Infrastructure.Repositories
                 if (!_context.Cats.Any(c => c.CatId == cat.CatId))
                 {
                     cat.Created = DateTime.UtcNow;
+
+                    // Add tags and relations
+                    foreach (var catTag in cat.CatTags)
+                    {
+                        var existingTag = await _context.Tags
+                            .FirstOrDefaultAsync(t => t.Name == catTag.Tag.Name);
+                        if (existingTag == null)
+                        {
+                            _context.Tags.Add(catTag.Tag);
+                        }
+                        else
+                        {
+                            catTag.TagId = existingTag.Id; // Use existing tag ID
+                        }
+
+                        _context.CatTags.Add(new CatTagEntity
+                        {
+                            Cat = cat,
+                            Tag = existingTag ?? catTag.Tag
+                        });
+                    }
+
                     _context.Cats.Add(cat);
                 }
             }

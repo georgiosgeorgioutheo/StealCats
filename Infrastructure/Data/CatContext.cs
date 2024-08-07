@@ -35,6 +35,8 @@ namespace Infrastructure.Data
                 .HasOne(ct => ct.Tag)
                 .WithMany(t => t.CatTags)
                 .HasForeignKey(ct => ct.TagId);
+
+          
         }
     }
 }
