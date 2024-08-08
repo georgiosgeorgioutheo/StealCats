@@ -65,35 +65,7 @@ namespace Infrastructure.Services
             var catList = JArray.Parse(response).ToObject<List<JObject>>();
             return catList ?? new List<JObject>();
         }
-        //public async Task<List<CatEntity>> FetchCatImagesAsync(int limit = 25, int hasBreeds = 1)
-        //{
-        //    // Construct the query parameters
-        //    var queryParams = new List<string>
-        //    {
-        //        $"limit={limit}",
-        //        $"has_breeds={hasBreeds}",
-        //        $"api_key={_apiKey}"
-        //    };
-
-        //    var queryString = string.Join("&", queryParams);
-        //    var response = await _httpClient.GetStringAsync($"{_baseUrl}?{queryString}");
-        //    var catList = JArray.Parse(response).ToObject<List<JObject>>();
-
-        //    var result = new List<CatEntity>();
-        //    if (catList != null)
-        //    {
-        //        foreach (var jObject in catList)
-        //        {
-        //            var cat = await CreateCatEntityAsync(jObject);
-        //            AddTagsToCatEntity(jObject, cat);
-        //            result.Add(cat);
-        //        }
-
-        //    }
-        //    return result;
-
-        //}
-
+        
 
         private async Task<CatEntity> CreateCatEntityAsync(JObject jObject)
         {
