@@ -22,6 +22,7 @@ namespace Infrastructure.Repositories
         public async Task<IEnumerable<CatEntity>> GetCatsAsync(int page, int pageSize)
         {
             return await _context.Cats
+                .OrderBy(x => x.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Include(c => c.CatTags).ThenInclude(ct => ct.Tag)
@@ -39,6 +40,7 @@ namespace Infrastructure.Repositories
         {
             return await _context.Cats
                 .Where(c => c.CatTags.Any(ct => ct.Tag.Name == tag))
+                .OrderBy(x => x.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Include(c => c.CatTags).ThenInclude(ct => ct.Tag)

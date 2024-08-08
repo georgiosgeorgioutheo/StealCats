@@ -1,5 +1,4 @@
 using Application.Services;
-using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Handlers;
@@ -11,33 +10,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using StealCats.Extensions;
 using System.Text.Json.Serialization;
+using Serilog;
+using Serilog.Events;
+
 
 var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
-//// Add services to the container.
-
-//builder.Services.AddControllers();
-//// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
-
-//var app = builder.Build();
-
-//// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
-
-//app.UseHttpsRedirection();
-
-//app.UseAuthorization();
-
-//app.MapControllers();
-
-//app.Run();
-
+builder.Host.UseSerilog();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -51,7 +36,13 @@ builder.Services.AddScoped<ICatRepository, CatRepository>();
 builder.Services.AddScoped<CatService>();
 builder.Services.AddHttpClient<IStealCatApiService, StealCatApiService>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["CatApi:BaseUrl"]);
+    var baseUrl = builder.Configuration["CatApi:BaseUrl"];
+    if (string.IsNullOrEmpty(baseUrl))
+    {
+        throw new InvalidOperationException("Base URL is not configured.");
+    }
+    client.BaseAddress = new Uri(baseUrl);
+    
 });
 builder.Services.Configure<JsonOptions>(options =>
 {
@@ -69,7 +60,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "StealCatApiProject v1");
-        c.RoutePrefix =  "swagger"; // Set Swagger UI at the app's root
+        c.RoutePrefix =  "swagger"; 
     });
 }
 
