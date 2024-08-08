@@ -9,6 +9,6 @@ namespace Core.Interfaces
 {
     public  interface IStealCatApiService
     {
-        Task<List<CatEntity>> FetchCatImagesAsync(int limit = 25,  int hasBreeds = 1);
+        Task<List<CatEntity>> StealCatsAsync(int limit = 25,  int hasBreeds = 1);
     }
 }

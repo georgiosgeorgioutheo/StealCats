@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,14 +29,16 @@ namespace StealCats.Extensions
                     .Produces(StatusCodes.Status500InternalServerError)
                     .WithOpenApi();
 
-                app.MapGet("/api/cats/{id}", async (ICatRepository catRepository, int id) =>
+                app.MapGet("/api/cats/{id}", async (HttpContext httpContext, ICatRepository catRepository, int id) =>
                         {
                             var cat = await catRepository.GetCatByIdAsync(id);
                             if (cat == null)
                             {
                                 throw new KeyNotFoundException("Cat not found");
                             }
-                            return Results.Ok(cat);
+                            var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
+                            var result = ToCatResponse(cat,baseUrl);
+                            return Results.Ok(result);
                         })
                         .WithName("GetCatById")
                         .WithTags("Cats")
@@ -46,12 +49,13 @@ namespace StealCats.Extensions
                         .WithOpenApi();
 
 
-                app.MapGet("/api/cats/tag/{tag}", async (ICatRepository catRepository, string tag, int page = 1, int pageSize = 10) =>
+                app.MapGet("/api/cats/tag/{tag}", async (HttpContext httpContext, ICatRepository catRepository, string tag, int page = 1, int pageSize = 10) =>
                 {
                     var cats = await catRepository.GetCatsByTagAsync(tag, page, pageSize);
-                   // var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
-                  //  var response = cats.Select(cat => ToCatResponse(cat, baseUrl));
-                    return Results.Ok(cats);
+                    var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
+                    var response = cats.Select(cat => ToCatResponse(cat, baseUrl));
+                    return Results.Ok(response);
+                  
                    
                 })
                 .WithName("GetCatsByTag")
@@ -61,10 +65,18 @@ namespace StealCats.Extensions
                 .Produces(StatusCodes.Status500InternalServerError)
                 .WithOpenApi();
 
-                app.MapPost("/api/cats/fetch", async (IStealCatApiService catService) =>
+
+
+
+                app.MapPost("/api/cats/Steal", async (IStealCatApiService catService, ICatRepository catRepository) =>
                 {
-                    await catService.FetchCatImagesAsync();
-                    return Results.Ok();
+                 List<CatEntity> cats = await catService.StealCatsAsync();
+                    await catRepository.AddCatsAsync(cats);
+                     var responseMessage = new
+                    {
+                        Message = $"{cats.Count} cats successfully added."
+                    };
+                    return Results.Ok(responseMessage);
                 })
                 .WithName("FetchAndStoreCats")
                 .WithTags("Cats")
@@ -72,6 +84,9 @@ namespace StealCats.Extensions
                 .Produces(StatusCodes.Status400BadRequest)
                 .Produces(StatusCodes.Status500InternalServerError)
                 .WithOpenApi();
+
+
+
 
                 // Endpoint to return an image as base64-encoded string in JSON
                 app.MapGet("/api/cats/{id}/image", async (ICatRepository catRepository, int id) =>

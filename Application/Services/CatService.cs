@@ -19,9 +19,8 @@ namespace Application.Services
             _stealCatApiService = catApiService;
         }
 
-        public async Task FetchAndStoreCatsAsync(int limit = 25, int hasBreeds = 1 )
+        public async Task StoreCatsAsync(IEnumerable<CatEntity> cats)
         {
-            var cats = await _stealCatApiService.FetchCatImagesAsync(limit,  hasBreeds);
             await _catRepository.AddCatsAsync(cats);
         }
 

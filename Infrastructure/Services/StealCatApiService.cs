@@ -1,8 +1,8 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
+
 
 namespace Infrastructure.Services
 {
@@ -15,19 +15,13 @@ namespace Infrastructure.Services
         public StealCatApiService(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
-            _baseUrl = configuration["CatApi:BaseUrl"];
-            _apiKey = configuration["CatApi:ApiKey"];
+            _baseUrl = configuration["StealCatApi:BaseUrl"];
+            _apiKey = configuration["StealCatApi:ApiKey"];
         }
 
-        //public CatApiService(HttpClient httpClient, IConfiguration configuration)
-        //{
-        //    _httpClient = httpClient;
-        //    _apiKey = configuration["CatApi:ApiKey"];
-        //    _baseUrl = configuration["CatApi:BaseUrl"];
-        //    _apiUrl = "https://api.thecatapi.com/v1/images/search?limit=25&has_breeds=1&api_key=live_lMH4324itjRC2C3aMinSKqgs6VJ7whDqJsDzG1UxWsS2QEO4uJJVl5JcgVepNMrk";
-        //}
+   
 
-        public async Task<List<CatEntity>> FetchCatImagesAsync(int limit = 25, int hasBreeds = 1)
+        public async Task<List<CatEntity>> StealCatsAsync(int limit = 25, int hasBreeds = 1)
         {
             // Construct the query parameters
             var queryString = ConstructQueryString(limit, hasBreeds);
@@ -45,6 +39,7 @@ namespace Infrastructure.Services
                     result.Add(cat);
                 }
             }
+
             return result;
         }
 

@@ -36,7 +36,7 @@ builder.Services.AddScoped<ICatRepository, CatRepository>();
 builder.Services.AddScoped<CatService>();
 builder.Services.AddHttpClient<IStealCatApiService, StealCatApiService>(client =>
 {
-    var baseUrl = builder.Configuration["CatApi:BaseUrl"];
+    var baseUrl = builder.Configuration["StealCatApi:BaseUrl"];
     if (string.IsNullOrEmpty(baseUrl))
     {
         throw new InvalidOperationException("Base URL is not configured.");
