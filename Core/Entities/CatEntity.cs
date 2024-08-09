@@ -10,8 +10,6 @@ namespace Core.Entities
 {
     public class CatEntity
     {
-
-
         public int Id { get; set; }
         public string CatId { get; set; }
         public int Width { get; set; }

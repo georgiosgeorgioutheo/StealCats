@@ -11,7 +11,6 @@ using Microsoft.OpenApi.Models;
 using StealCats.Extensions;
 using System.Text.Json.Serialization;
 using Serilog;
-using Serilog.Events;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -84,7 +83,5 @@ app.Use(async (context, next) =>
 });
 
 app.MapStealCatApiEndpoints();
-
-
 
 app.Run();

@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+﻿using Core.DTOs;
+using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -47,20 +48,57 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task AddCatsAsync(IEnumerable<CatEntity> cats)
+        public async Task<AddedCatsResult> AddCatsAsync(IEnumerable<CatEntity> cats)
         {
+            AddedCatsResult addedCatsResult = new AddedCatsResult();
             foreach (var cat in cats)
             {
                 var existingCat = await _context.Cats
-                    .Include(c => c.CatTags).ThenInclude(ct => ct.Tag)
                     .FirstOrDefaultAsync(c => c.CatId == cat.CatId);
 
                 if (existingCat == null)
                 {
                     await AddNewCatAsync(cat);
+                    addedCatsResult.AddedCount++;
+                }
+                else
+                {
+                    await UpdateCatAsync(cat);
+                    addedCatsResult.UpdatedCount++;
                 }
             }
 
+            await _context.SaveChangesAsync();
+            return addedCatsResult;
+        }
+
+        public async Task UpdateCatAsync(CatEntity cat)
+        {
+            var existingCat = await _context.Cats
+             .Include(c => c.CatTags)
+             .ThenInclude(ct => ct.Tag)
+             .FirstOrDefaultAsync(c => c.CatId == cat.CatId);
+
+            if (existingCat == null)
+            {
+                throw new InvalidOperationException("Cat not found for update.");
+            }
+
+            
+            existingCat.Width = cat.Width;
+            existingCat.Height = cat.Height;
+            existingCat.Image = cat.Image;
+            existingCat.Created = DateTime.UtcNow; // Update the timestamp if necessary
+
+            // Update the tags
+            _context.CatTags.RemoveRange(existingCat.CatTags); // Remove existing tags
+            existingCat.CatTags.Clear(); // Clear the tags list
+
+            foreach (var newTag in cat.CatTags)
+            {
+                await CheckAndAddTagAsync(newTag);
+                existingCat.CatTags.Add(newTag);
+            }
             await _context.SaveChangesAsync();
         }
 

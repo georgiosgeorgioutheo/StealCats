@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+﻿using Core.DTOs;
+using Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,6 @@ namespace Core.Interfaces
         Task<IEnumerable<CatEntity>> GetCatsAsync(int page, int pageSize);
         Task<CatEntity> GetCatByIdAsync(int id);
         Task<IEnumerable<CatEntity>> GetCatsByTagAsync(string tag, int page, int pageSize);
-        Task AddCatsAsync(IEnumerable<CatEntity> cats);
+        Task<AddedCatsResult> AddCatsAsync(IEnumerable<CatEntity> cats);
     }
 }

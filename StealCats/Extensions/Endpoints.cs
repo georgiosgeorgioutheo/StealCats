@@ -1,4 +1,6 @@
-﻿using Core.Entities;
+﻿using Core.DTOs;
+using Core.Entities;
+using Core.Mappings;
 using Core.Interfaces;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -7,6 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.Collections.Generic;
 using System.Net.Http;
+using Application.Services;
+using Infrastructure.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace StealCats.Extensions
 {
@@ -15,11 +20,11 @@ namespace StealCats.Extensions
         public static void MapStealCatApiEndpoints(this IEndpointRouteBuilder app)
         {
             
-                app.MapGet("/api/cats", async (HttpContext httpContext, ICatRepository catRepository, int page = 1, int pageSize = 10) =>
+                app.MapGet("/api/cats", async (HttpContext httpContext, CatService catService, int page = 1, int pageSize = 10) =>
                     {
-                        var cats = await catRepository.GetCatsAsync(page, pageSize);
+                        var cats = await catService.GetCatsAsync(page, pageSize);
                         var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
-                        var response = cats.Select(cat => ToCatResponse(cat, baseUrl));
+                        var response = cats.Select(cat => CatMappings.ToCatResponse(cat, baseUrl));
                         return Results.Ok(response);
                     })
                     .WithName("GetCats")
@@ -29,15 +34,15 @@ namespace StealCats.Extensions
                     .Produces(StatusCodes.Status500InternalServerError)
                     .WithOpenApi();
 
-                app.MapGet("/api/cats/{id}", async (HttpContext httpContext, ICatRepository catRepository, int id) =>
+                app.MapGet("/api/cats/{id}", async (HttpContext httpContext, CatService catService, int id) =>
                         {
-                            var cat = await catRepository.GetCatByIdAsync(id);
+                            var cat = await catService.GetCatByIdAsync(id);
                             if (cat == null)
                             {
                                 throw new KeyNotFoundException("Cat not found");
                             }
                             var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
-                            var result = ToCatResponse(cat,baseUrl);
+                            var result = CatMappings.ToCatResponse(cat,baseUrl);
                             return Results.Ok(result);
                         })
                         .WithName("GetCatById")
@@ -49,11 +54,11 @@ namespace StealCats.Extensions
                         .WithOpenApi();
 
 
-                app.MapGet("/api/cats/tag/{tag}", async (HttpContext httpContext, ICatRepository catRepository, string tag, int page = 1, int pageSize = 10) =>
+                app.MapGet("/api/cats/tag/{tag}", async (HttpContext httpContext, CatService catService, string tag, int page = 1, int pageSize = 10) =>
                 {
-                    var cats = await catRepository.GetCatsByTagAsync(tag, page, pageSize);
+                    var cats = await catService.GetCatsByTagAsync(tag, page, pageSize);
                     var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
-                    var response = cats.Select(cat => ToCatResponse(cat, baseUrl));
+                    var response = cats.Select(cat => CatMappings.ToCatResponse(cat, baseUrl));
                     return Results.Ok(response);
                   
                    
@@ -68,15 +73,17 @@ namespace StealCats.Extensions
 
 
 
-                app.MapPost("/api/cats/Steal", async (IStealCatApiService catService, ICatRepository catRepository) =>
+                app.MapPost("/api/cats/Steal", async (IStealCatApiService stealCatService, CatService catService) =>
                 {
-                 List<CatEntity> cats = await catService.StealCatsAsync();
-                    await catRepository.AddCatsAsync(cats);
+
+                    List<CatEntity> cats = await stealCatService.StealCatsAsync();
+                    AddedCatsResult addedCatsResult = await catService.StoreCatsAsync(cats);
                      var responseMessage = new
-                    {
-                        Message = $"{cats.Count} cats successfully added."
+                     {
+                        Message = ($"Added: {addedCatsResult.AddedCount}, Updated: {addedCatsResult.UpdatedCount}")
                     };
                     return Results.Ok(responseMessage);
+
                 })
                 .WithName("FetchAndStoreCats")
                 .WithTags("Cats")
@@ -85,13 +92,13 @@ namespace StealCats.Extensions
                 .Produces(StatusCodes.Status500InternalServerError)
                 .WithOpenApi();
 
+        
 
 
-
-                // Endpoint to return an image as base64-encoded string in JSON
-                app.MapGet("/api/cats/{id}/image", async (ICatRepository catRepository, int id) =>
+            // Endpoint to return an image as base64-encoded string in JSON
+            app.MapGet("/api/cats/{id}/image", async (CatService catService, int id) =>
                 {
-                    var cat = await catRepository.GetCatByIdAsync(id);
+                    var cat = await catService.GetCatByIdAsync(id);
                     if (cat == null || cat.Image == null)
                     {
                         throw new KeyNotFoundException("Cat not found");
@@ -107,21 +114,12 @@ namespace StealCats.Extensions
                 .Produces(StatusCodes.Status500InternalServerError)
                 .WithOpenApi();
             }
-
-            private static object ToCatResponse(CatEntity cat, string baseUrl)
-            {
-                return new
-                {
-                    cat.Id,
-                    cat.CatId,
-                    cat.Width,
-                    cat.Height,
-                    cat.Created,
-                    ImageUrl = $"{baseUrl}/api/cats/{cat.Id}/image",
-                    Tags = cat.CatTags.Select(ct => ct.Tag.Name).ToList()
-                };
-            }
+        
+       
         }
     }
+
+
+
 
 
