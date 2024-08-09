@@ -20,9 +20,9 @@ namespace StealCats.Extensions
         public static void MapStealCatApiEndpoints(this IEndpointRouteBuilder app)
         {
             
-                app.MapGet("/api/cats", async (HttpContext httpContext, CatService catService, int page = 1, int pageSize = 10) =>
+                app.MapGet("/api/cats", async (HttpContext httpContext, ICatRepository catRepository, int page = 1, int pageSize = 10) =>
                     {
-                        var cats = await catService.GetCatsAsync(page, pageSize);
+                        var cats = await catRepository.GetCatsAsync(page, pageSize);
                         var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
                         var response = cats.Select(cat => CatMappings.ToCatResponse(cat, baseUrl));
                         return Results.Ok(response);
@@ -34,9 +34,9 @@ namespace StealCats.Extensions
                     .Produces(StatusCodes.Status500InternalServerError)
                     .WithOpenApi();
 
-                app.MapGet("/api/cats/{id}", async (HttpContext httpContext, CatService catService, int id) =>
+                app.MapGet("/api/cats/{id}", async (HttpContext httpContext, ICatRepository catRepository, int id) =>
                         {
-                            var cat = await catService.GetCatByIdAsync(id);
+                            var cat = await catRepository.GetCatByIdAsync(id);
                             if (cat == null)
                             {
                                 throw new KeyNotFoundException("Cat not found");
@@ -54,9 +54,9 @@ namespace StealCats.Extensions
                         .WithOpenApi();
 
 
-                app.MapGet("/api/cats/tag/{tag}", async (HttpContext httpContext, CatService catService, string tag, int page = 1, int pageSize = 10) =>
+                app.MapGet("/api/cats/tag/{tag}", async (HttpContext httpContext, ICatRepository catRepository, string tag, int page = 1, int pageSize = 10) =>
                 {
-                    var cats = await catService.GetCatsByTagAsync(tag, page, pageSize);
+                    var cats = await catRepository.GetCatsByTagAsync(tag, page, pageSize);
                     var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
                     var response = cats.Select(cat => CatMappings.ToCatResponse(cat, baseUrl));
                     return Results.Ok(response);
@@ -73,11 +73,11 @@ namespace StealCats.Extensions
 
 
 
-                app.MapPost("/api/cats/Steal", async (IStealCatApiService stealCatService, CatService catService) =>
+                app.MapPost("/api/cats/Steal", async (IStealCatApiService stealCatService, ICatRepository catRepository) =>
                 {
 
                     List<CatEntity> cats = await stealCatService.StealCatsAsync();
-                    AddedCatsResult addedCatsResult = await catService.StoreCatsAsync(cats);
+                    AddedCatsResult addedCatsResult = await catRepository.AddCatsAsync(cats);
                      var responseMessage = new
                      {
                         Message = ($"Added: {addedCatsResult.AddedCount}, Updated: {addedCatsResult.UpdatedCount}")
@@ -96,9 +96,9 @@ namespace StealCats.Extensions
 
 
             // Endpoint to return an image as base64-encoded string in JSON
-            app.MapGet("/api/cats/{id}/image", async (CatService catService, int id) =>
+            app.MapGet("/api/cats/{id}/image", async (ICatRepository catRepository, int id) =>
                 {
-                    var cat = await catService.GetCatByIdAsync(id);
+                    var cat = await catRepository.GetCatByIdAsync(id);
                     if (cat == null || cat.Image == null)
                     {
                         throw new KeyNotFoundException("Cat not found");
