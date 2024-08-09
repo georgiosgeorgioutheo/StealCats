@@ -11,12 +11,10 @@ namespace Application.Services
     public class CatService
     {
         private readonly ICatRepository _catRepository;
-        private readonly IStealCatApiService _stealCatApiService;
 
-        public CatService(ICatRepository catRepository, IStealCatApiService catApiService)
+        public CatService(ICatRepository catRepository)
         {
             _catRepository = catRepository;
-            _stealCatApiService = catApiService;
         }
 
         public async Task StoreCatsAsync(IEnumerable<CatEntity> cats)

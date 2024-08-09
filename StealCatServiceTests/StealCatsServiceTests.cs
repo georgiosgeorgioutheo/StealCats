@@ -87,7 +87,7 @@ namespace StealCatServiceTests
             var catService = new StealCatApiService(_httpClient, _configuration);
 
             // Act
-            var result = await catService.FetchCatImagesAsync();
+            var result = await catService.StealCatsAsync();
 
             // Assert
             Assert.NotNull(result);
@@ -129,7 +129,7 @@ namespace StealCatServiceTests
             var catService = new StealCatApiService(_httpClient, _configuration);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await catService.FetchCatImagesAsync());
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await catService.StealCatsAsync());
         }
     }
 }
