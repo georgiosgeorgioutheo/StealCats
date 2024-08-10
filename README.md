@@ -18,7 +18,8 @@ First, clone the repository to your local machine:
 
 ```bash
 git clone https://github.com/yourusername/StealCats.git
-cd StealCats
+cd StealCats ```
 
+```
 
-### 1. Clone the Repository
+## Getting Started
