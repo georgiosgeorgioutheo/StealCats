@@ -58,15 +58,25 @@ dotnet ef database update -p Infrastructure -s StealCats
 
 ### 4. Build the Project
 #### Restore Dependencies<br>
-Before building the project, restore the dependencies:
 ```bash
 dotnet restore
 ```
 #### Build the Solution
-Now, build the project:
+
 
 ```bash
 dotnet build
 ```
+### 5. Running the Application
+#### Run the Application
+To run the application, use the following command:
 
+```bash
+Copy code
+dotnet run
+```
+The application will start, and you can access it via:
+
+#### API: https://localhost:5001 (or http://localhost:5000)
+#### Swagger UI: https://localhost:5001/swagger (or http://localhost:5000/swagger)
 
