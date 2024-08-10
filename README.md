@@ -21,3 +21,4 @@ git clone https://github.com/yourusername/StealCats.git
 cd StealCats
 
 
+### 1. Clone the Repository
