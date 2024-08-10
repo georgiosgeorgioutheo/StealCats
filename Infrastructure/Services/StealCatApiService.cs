@@ -36,7 +36,10 @@ namespace Infrastructure.Services
 
             // Fetch and parse the cat list
             var catList = await FetchCatListAsync(queryString);
-          
+            if (catList == null || catList.Any(cat => string.IsNullOrEmpty(cat.Id)))
+            {
+                throw new InvalidOperationException("Invalid JSON data. One or more CatApiResponse items have a null or empty ID.");
+            }
             var result = new List<CatEntity>();
 
             foreach (var catApiResponse in catList)

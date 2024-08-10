@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{BBD8E124-3FA0-44B8-B28B-0AB4691BD654}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StealCatServiceTests", "StealCatServiceTests\StealCatServiceTests.csproj", "{8ABEFC12-5A66-46DE-A867-6F7836570C1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StealCatServiceTests", "StealCatServiceTests\StealCatServiceTests.csproj", "{8ABEFC12-5A66-46DE-A867-6F7836570C1B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

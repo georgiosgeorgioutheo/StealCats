@@ -119,16 +119,16 @@ namespace StealCatServiceTests
             ).ToString();
 
             _httpMessageHandlerMock.Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(responseContent)
-                });
+         .Setup<Task<HttpResponseMessage>>(
+             "SendAsync",
+             ItExpr.IsAny<HttpRequestMessage>(),
+             ItExpr.IsAny<CancellationToken>()
+         )
+         .ReturnsAsync(new HttpResponseMessage
+         {
+             StatusCode = HttpStatusCode.OK,
+             Content = new StringContent(responseContent)
+         });
 
             var catService = new StealCatApiService(_httpClient, _configuration, _validator);
 
