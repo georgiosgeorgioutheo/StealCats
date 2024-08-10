@@ -43,6 +43,30 @@ Open the appsettings.json file in the StealCats project and configure your SQL S
 }
 ```
 
-Replace YOUR_SERVER_NAME with your SQL Server instance name.
-Update the ApiKey with your API key from The Cat API.
+Replace YOUR_SERVER_NAME with your SQL Server instance name.<br>
+Replace the your_api_key with your API key from The Cat API.<br>
+
 ### 3. Initialize the Database
+ Add the initial migration
+```bash
+dotnet ef migrations add InitialCreate -p Infrastructure -s StealCats
+```
+Update the database with the migration
+```bash
+dotnet ef database update -p Infrastructure -s StealCats
+```
+
+### 4. Build the Project
+#### Restore Dependencies<br>
+Before building the project, restore the dependencies:
+```bash
+dotnet restore
+```
+#### Build the Solution
+Now, build the project:
+
+```bash
+dotnet build
+```
+
+
