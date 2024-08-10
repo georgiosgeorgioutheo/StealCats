@@ -40,4 +40,9 @@ Open the appsettings.json file in the StealCats project and configure your SQL S
     }
   },
   "AllowedHosts": "*"
-}```
+}
+```
+
+Replace YOUR_SERVER_NAME with your SQL Server instance name.
+Update the ApiKey with your API key from The Cat API.
+### 3. Initialize the Database
