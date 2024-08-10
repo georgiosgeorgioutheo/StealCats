@@ -77,8 +77,9 @@ dotnet run
 ```
 The application will start, and you can access it via:
 
-#### API: https://localhost:5001 (or http://localhost:5000)
-#### Swagger UI: https://localhost:5001/swagger (or http://localhost:5000/swagger)
+#### HTTP: http://localhost:5157
+#### HTTPS: https://localhost:7187
+#### Swagger UI: https://localhost:7187/swagger or http://localhost:5157/swagger
 
 ### 6. Using the API
 #### Fetch and Store Cat Images
