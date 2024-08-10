@@ -61,11 +61,23 @@ app.Use(async (context, next) =>
     catch (ValidationException ex)
     {
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
-        await context.Response.WriteAsJsonAsync(new
+
+        var errorResponse = new
         {
             error = "Validation error",
-            details = ex.Errors.Select(e => new { e.PropertyName, e.ErrorMessage })
-        });
+            details = ex.Errors.Select(e => new
+            {
+                propertyName = e.PropertyName switch
+                {
+                    "Item1" => "page",
+                    "Item2" => "pageSize",
+                    _ => e.PropertyName
+                },
+                errorMessage = e.ErrorMessage
+            })
+        };
+
+        await context.Response.WriteAsJsonAsync(errorResponse);
     }
     catch (Exception ex)
     {
