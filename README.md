@@ -20,7 +20,7 @@ First, clone the repository to your local machine:
 git clone https://github.com/yourusername/StealCats.git
 cd StealCats
 
-Configure the Connection String
+### 2.Configure the Connection String
 Open the appsettings.json file in the StealCats project and configure your SQL Server connection string as follows:
 
 {
