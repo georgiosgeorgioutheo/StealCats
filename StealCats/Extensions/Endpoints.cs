@@ -1,6 +1,5 @@
 ﻿using Core.DTOs;
 using Core.Entities;
-using Core.Mappings;
 using Core.Interfaces;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -12,6 +11,11 @@ using System.Net.Http;
 using Application.Services;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Application.Mappings;
+using System.ComponentModel.DataAnnotations;
+using Application.Validations;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Azure;
 
 namespace StealCats.Extensions
 {
@@ -22,9 +26,16 @@ namespace StealCats.Extensions
             
                 app.MapGet("/api/cats", async (HttpContext httpContext, ICatRepository catRepository, int page = 1, int pageSize = 10) =>
                     {
+                        await ValidationHelper.ValidatePaginationParameters( page, pageSize); 
                         var cats = await catRepository.GetCatsAsync(page, pageSize);
+                        await ValidationHelper.ValidateCatEntities(cats);
+
                         var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
+                        await ValidationHelper.ValidateBaseUrlAsync(baseUrl);
+
+
                         var response = cats.Select(cat => CatMappings.ToCatResponse(cat, baseUrl));
+                        await ValidationHelper.ValidateCatResponseDtoListAsync(response);
                         return Results.Ok(response);
                     })
                     .WithName("GetCats")
@@ -34,15 +45,23 @@ namespace StealCats.Extensions
                     .Produces(StatusCodes.Status500InternalServerError)
                     .WithOpenApi();
 
+
+
                 app.MapGet("/api/cats/{id}", async (HttpContext httpContext, ICatRepository catRepository, int id) =>
                         {
                             var cat = await catRepository.GetCatByIdAsync(id);
+                           
                             if (cat == null)
                             {
                                 throw new KeyNotFoundException("Cat not found");
                             }
+                            await ValidationHelper.ValidateCatEntityAsync(cat);
+
                             var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
+                            await ValidationHelper.ValidateBaseUrlAsync(baseUrl);
+
                             var result = CatMappings.ToCatResponse(cat,baseUrl);
+                            await ValidationHelper.ValidateCatResponseDtoAsync(result);
                             return Results.Ok(result);
                         })
                         .WithName("GetCatById")
@@ -56,9 +75,16 @@ namespace StealCats.Extensions
 
                 app.MapGet("/api/cats/tag/{tag}", async (HttpContext httpContext, ICatRepository catRepository, string tag, int page = 1, int pageSize = 10) =>
                 {
+
+                    await ValidationHelper.ValidatePaginationParameters(page, pageSize);
                     var cats = await catRepository.GetCatsByTagAsync(tag, page, pageSize);
+                    await ValidationHelper.ValidateCatEntities(cats);
+
                     var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
+                    await ValidationHelper.ValidateBaseUrlAsync(baseUrl);
+
                     var response = cats.Select(cat => CatMappings.ToCatResponse(cat, baseUrl));
+                    await ValidationHelper.ValidateCatResponseDtoListAsync(response);
                     return Results.Ok(response);
                   
                    
@@ -75,13 +101,16 @@ namespace StealCats.Extensions
 
                 app.MapPost("/api/cats/Steal", async (IStealCatApiService stealCatService, ICatRepository catRepository) =>
                 {
-
+                    
                     List<CatEntity> cats = await stealCatService.StealCatsAsync();
+                    await ValidationHelper.ValidateCatEntities(cats);
+
                     AddedCatsResult addedCatsResult = await catRepository.AddCatsAsync(cats);
                      var responseMessage = new
                      {
                         Message = ($"Added: {addedCatsResult.AddedCount}, Updated: {addedCatsResult.UpdatedCount}")
                     };
+
                     return Results.Ok(responseMessage);
 
                 })
@@ -103,12 +132,14 @@ namespace StealCats.Extensions
                     {
                         throw new KeyNotFoundException("Cat not found");
                     }
+                    await ValidationHelper.ValidateCatEntityAsync(cat);
 
+                   await  ValidationHelper.ValidateImageFile(cat.Image, "image/jpeg");
                     return Results.File(cat.Image, "image/jpeg");
                 })
-             .WithName("GetCatImage")
-             .WithTags("Cats")
-             .Produces(StatusCodes.Status200OK, typeof(FileResult))
+                .WithName("GetCatImage")
+                .WithTags("Cats")
+                .Produces(StatusCodes.Status200OK, typeof(FileResult))
                  .Produces(StatusCodes.Status404NotFound)
                 .Produces(StatusCodes.Status400BadRequest)
                 .Produces(StatusCodes.Status500InternalServerError)

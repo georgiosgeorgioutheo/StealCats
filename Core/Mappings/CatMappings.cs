@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Mappings
+namespace Application.Mappings
 {
     public static class CatMappings
     {
@@ -25,13 +25,6 @@ namespace Core.Mappings
         }
         public static async Task<CatEntity> ToCatEntityAsync(this CatApiResponse catApiResponse, HttpClient httpClient)
         {
-            if (string.IsNullOrEmpty(catApiResponse.Id) ||
-                catApiResponse.Width <= 0 ||
-                catApiResponse.Height <= 0 ||
-                string.IsNullOrEmpty(catApiResponse.Url))
-            {
-                throw new InvalidOperationException("Invalid JSON data.");
-            }
 
             var catEntity = new CatEntity
             {

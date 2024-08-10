@@ -1,9 +1,6 @@
-using Application.Services;
-using Core.Interfaces;
+
 using Infrastructure.Data;
-using Infrastructure.Handlers;
-using Infrastructure.Repositories;
-using Infrastructure.Services;
+
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +8,8 @@ using Microsoft.OpenApi.Models;
 using StealCats.Extensions;
 using System.Text.Json.Serialization;
 using Serilog;
+using FluentValidation;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,26 +29,14 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddDbContext<CatContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddScoped<ICatRepository, CatRepository>();
-builder.Services.AddScoped<CatService>();
-builder.Services.AddHttpClient<IStealCatApiService, StealCatApiService>(client =>
-{
-    var baseUrl = builder.Configuration["StealCatApi:BaseUrl"];
-    if (string.IsNullOrEmpty(baseUrl))
-    {
-        throw new InvalidOperationException("Base URL is not configured.");
-    }
-    client.BaseAddress = new Uri(baseUrl);
-    
-});
 builder.Services.Configure<JsonOptions>(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.WriteIndented = true;
 });
-builder.Services.AddSingleton<IExceptionHandler, GlobalExceptionHandler>();
 
+
+builder.Services.AddProjectServices(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -70,6 +57,15 @@ app.Use(async (context, next) =>
     try
     {
         await next();
+    }
+    catch (ValidationException ex)
+    {
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        await context.Response.WriteAsJsonAsync(new
+        {
+            error = "Validation error",
+            details = ex.Errors.Select(e => new { e.PropertyName, e.ErrorMessage })
+        });
     }
     catch (Exception ex)
     {

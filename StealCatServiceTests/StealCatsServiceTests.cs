@@ -1,4 +1,6 @@
 ﻿using Application.Services;
+using Core.DTOs;
+using FluentValidation;
 using Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -19,6 +21,8 @@ namespace StealCatServiceTests
         private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
+        private readonly IValidator<CatApiResponse> _validator;
+
         public StealCatsServiceTests()
         {
             _httpMessageHandlerMock = new Mock<HttpMessageHandler>();
@@ -84,7 +88,7 @@ namespace StealCatServiceTests
                     Content = new ByteArrayContent(new byte[] { 1, 2, 3 })
                 });
 
-            var catService = new StealCatApiService(_httpClient, _configuration);
+            var catService = new StealCatApiService(_httpClient, _configuration,_validator);
 
             // Act
             var result = await catService.StealCatsAsync();
@@ -126,7 +130,7 @@ namespace StealCatServiceTests
                     Content = new StringContent(responseContent)
                 });
 
-            var catService = new StealCatApiService(_httpClient, _configuration);
+            var catService = new StealCatApiService(_httpClient, _configuration, _validator);
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await catService.StealCatsAsync());

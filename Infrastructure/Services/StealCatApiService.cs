@@ -1,10 +1,12 @@
-﻿using Core.DTOs;
+﻿using Application.Mappings;
+using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
-using Core.Mappings;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
 
@@ -15,12 +17,14 @@ namespace Infrastructure.Services
         private readonly HttpClient _httpClient;
         private readonly string? _baseUrl;
         private readonly string? _apiKey;
-    
-        public StealCatApiService(HttpClient httpClient, IConfiguration configuration)
+        private readonly IValidator<CatApiResponse> _validator;
+
+        public StealCatApiService(HttpClient httpClient, IConfiguration configuration, IValidator<CatApiResponse> validator)
         {
             _httpClient = httpClient;
             _baseUrl = configuration["StealCatApi:BaseUrl"];
             _apiKey = configuration["StealCatApi:ApiKey"];
+            _validator = validator;
         }
 
    
@@ -32,7 +36,7 @@ namespace Infrastructure.Services
 
             // Fetch and parse the cat list
             var catList = await FetchCatListAsync(queryString);
-
+          
             var result = new List<CatEntity>();
 
             foreach (var catApiResponse in catList)
