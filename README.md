@@ -18,8 +18,26 @@ First, clone the repository to your local machine:
 
 ```bash
 git clone https://github.com/yourusername/StealCats.git
-cd StealCats ```
+cd StealCats 
 
 ```
 
-## Getting Started
+### 2. Configure the Connection String
+Open the appsettings.json file in the StealCats project and configure your SQL Server connection string as follows:
+```bash
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=CatDb;Trusted_Connection=True;MultipleActiveResultSets=true"
+  },
+  "StealCatApi": {
+    "ApiKey": "your_api_key",
+    "BaseUrl": "https://api.thecatapi.com/v1/images/search"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}```
