@@ -80,3 +80,32 @@ The application will start, and you can access it via:
 #### API: https://localhost:5001 (or http://localhost:5000)
 #### Swagger UI: https://localhost:5001/swagger (or http://localhost:5000/swagger)
 
+### 6. Using the API
+#### Fetch and Store Cat Images
+To fetch and store cat images from The Cat API:
+
+
+```bash
+POST /api/cats/steal
+```
+
+Get Cats with Pagination
+To retrieve cats with pagination:
+
+
+```bash
+GET /api/cats?page=1&pageSize=10
+```
+
+Get Cat by ID
+To retrieve a specific cat by its ID:
+
+```bash
+GET /api/cats/{id}
+```
+Get Cat Image by ID
+
+To retrieve a cat's image by its ID:
+```bash
+GET /api/cats/{id}/image
+```
