@@ -24,7 +24,33 @@ namespace Infrastructure.Repositories
                 .Include(c => c.CatTags).ThenInclude(ct => ct.Tag)
                 .ToListAsync();
         }
+      
+        public async Task<PageResponseDto> GetPageResponseDto(int currentPage,int pageSize, string tag)
+        {
+            PageResponseDto pageResponseDto = new PageResponseDto();
+            var catsQuery = _context.Cats.AsQueryable();
 
+            if (!string.IsNullOrEmpty(tag))
+            {
+                catsQuery = catsQuery.Where(c => c.CatTags.Any(ct => ct.Tag.Name == tag));
+            }
+
+           int totalCats = await catsQuery.CountAsync();
+            pageResponseDto.TotalCount = totalCats;
+
+            // Calculate the total number of pages
+            var totalPages = (int)Math.Ceiling(totalCats / (double)pageSize);
+            pageResponseDto.PageCount = totalPages;
+            pageResponseDto.CurrentPage = currentPage;
+            pageResponseDto.PageSize = pageSize;
+            pageResponseDto.PageInfo = SetPageString(currentPage, totalPages);
+            return pageResponseDto;
+        }
+        public static string SetPageString(int currentPage, int totalPages)
+        {
+            return $"Page {currentPage} of {totalPages}";
+
+        }
         public async Task<CatEntity>? GetCatByIdAsync(int id)
         {
             return await _context.Cats

@@ -8,6 +8,9 @@ namespace Core.Interfaces
 
         Task<IEnumerable<CatEntity>> GetCatsAsync(int page, int pageSize);
         Task<CatEntity> GetCatByIdAsync(int id);
+
+        Task<PageResponseDto> GetPageResponseDto(int currentPage,int pageSize, string tag);
+        
         Task<IEnumerable<CatEntity>> GetCatsByTagAsync(string tag, int page, int pageSize);
         Task<AddedCatsResult> AddCatsAsync(IEnumerable<CatEntity> cats);
     }

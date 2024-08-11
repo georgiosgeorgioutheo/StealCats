@@ -33,9 +33,12 @@ namespace StealCats.Extensions
                         var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
                         await ValidationHelper.ValidateBaseUrlAsync(baseUrl);
 
+                        var totalPages = await catRepository.GetPageResponseDto(page,pageSize, "");
 
-                        var response = cats.Select(cat => CatMappings.ToCatResponse(cat, baseUrl));
-                        await ValidationHelper.ValidateCatResponseDtoListAsync(response);
+                        var catsResponse = cats.Select(cat => CatMappings.ToCatResponse(cat, baseUrl));
+                        await ValidationHelper.ValidateCatResponseDtoListAsync(catsResponse);
+                        var response  = cats.Select(cat => CatMappings.ToPaginatedCatResponse(catsResponse, totalPages));
+
                         return Results.Ok(response);
                     })
                     .WithName("GetCats")
@@ -60,6 +63,7 @@ namespace StealCats.Extensions
                             var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
                             await ValidationHelper.ValidateBaseUrlAsync(baseUrl);
 
+                            
                             var result = CatMappings.ToCatResponse(cat,baseUrl);
                             await ValidationHelper.ValidateCatResponseDtoAsync(result);
                             return Results.Ok(result);
@@ -82,6 +86,8 @@ namespace StealCats.Extensions
 
                     var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
                     await ValidationHelper.ValidateBaseUrlAsync(baseUrl);
+
+                  
 
                     var response = cats.Select(cat => CatMappings.ToCatResponse(cat, baseUrl));
                     await ValidationHelper.ValidateCatResponseDtoListAsync(response);

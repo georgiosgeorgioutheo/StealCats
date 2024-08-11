@@ -1,5 +1,6 @@
 ﻿using Core.DTOs;
 using Core.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Mappings
 {
@@ -15,9 +16,21 @@ namespace Application.Mappings
                 Height = cat.Height,
                 Created = cat.Created,
                 ImageUrl = $"{baseUrl}/api/cats/{cat.Id}/image",
-                Tags = cat.CatTags.Select(ct => ct.Tag.Name).ToList()
+                Tags = cat.CatTags.Select(ct => ct.Tag.Name).ToList(), 
+              
             };
         }
+
+        public static PaginatedCatResponseDTO ToPaginatedCatResponse(IEnumerable<CatResponseDto> cats, PageResponseDto pageResponseDto)
+        {
+            PaginatedCatResponseDTO responseDTO = new PaginatedCatResponseDTO();
+            responseDTO.pageResponseDto = pageResponseDto;
+            responseDTO.CatResponses = cats;
+            return responseDTO;
+        }
+
+
+
         public static async Task<CatEntity> ToCatEntityAsync(this CatApiResponse catApiResponse, HttpClient httpClient)
         {
 
