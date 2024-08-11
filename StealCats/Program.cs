@@ -8,13 +8,13 @@ using StealCats.Extensions;
 using System.Text.Json.Serialization;
 using Serilog;
 using FluentValidation;
+using Infrastructure.Handlers;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
+    .MinimumLevel.Verbose()
     .WriteTo.Console()
     .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
@@ -37,6 +37,7 @@ builder.Services.Configure<JsonOptions>(options =>
 
 builder.Services.AddProjectServices(builder.Configuration);
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Serilog;
 
 using System.Net;
@@ -9,19 +10,18 @@ namespace Infrastructure.Handlers
 {
     public class GlobalExceptionHandler : IExceptionHandler
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<GlobalExceptionHandler> _logger;
 
-        public GlobalExceptionHandler(ILogger logger)
+        public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
         {
             _logger = logger;
         }
-
         public async ValueTask<bool> TryHandleAsync(
             HttpContext httpContext,
             Exception exception,
             CancellationToken cancellationToken)
         {
-            _logger.Error(exception, "An error occurred while processing your request: {Message}", exception.Message);
+            _logger.LogError(exception, "An error occurred while processing your request.");
 
             var errorResponse = new ErrorResponse
             {
@@ -48,7 +48,7 @@ namespace Infrastructure.Handlers
 
             await httpContext.Response.WriteAsJsonAsync(errorResponse, cancellationToken);
 
-            _logger.Error("Exception handled: {Title} - {StatusCode} - {Message}",
+            _logger.LogError("Exception handled: {Title} - {StatusCode} - {Message}",
                       errorResponse.Title, errorResponse.StatusCode, exception.Message);
 
             return true;

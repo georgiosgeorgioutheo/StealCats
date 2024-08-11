@@ -32,14 +32,15 @@ namespace StealCats.Extensions
                 client.BaseAddress = new Uri(baseUrl);
             });
 
-            // Register exception handler
-            services.AddSingleton<IExceptionHandler, GlobalExceptionHandler>();
+         
 
             // Register validators
             services.AddTransient<IValidator<CatApiResponse>, CatApiResponseValidator>();
             services.AddTransient<IValidator<CatResponseDto>, CatResponseDtoValidator>();
             services.AddTransient<IValidator<CatEntity>, CatEntityValidator>();
             services.AddTransient<IValidator<(int page, int pageSize)>, CatRequestValidator>();
+
+            services.AddSingleton<IExceptionHandler, GlobalExceptionHandler>();
         }
     }
 }
