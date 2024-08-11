@@ -1,21 +1,17 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Serilog;
+
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Infrastructure.Handlers
 {
     public class GlobalExceptionHandler : IExceptionHandler
     {
-        private readonly ILogger<GlobalExceptionHandler> _logger;
+        private readonly ILogger _logger;
 
-        public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+        public GlobalExceptionHandler(ILogger logger)
         {
             _logger = logger;
         }
@@ -25,7 +21,7 @@ namespace Infrastructure.Handlers
             Exception exception,
             CancellationToken cancellationToken)
         {
-            _logger.LogError($"An error occurred while processing your request: {exception.Message}");
+            _logger.Error(exception, "An error occurred while processing your request: {Message}", exception.Message);
 
             var errorResponse = new ErrorResponse
             {
@@ -52,7 +48,8 @@ namespace Infrastructure.Handlers
 
             await httpContext.Response.WriteAsJsonAsync(errorResponse, cancellationToken);
 
-            _logger.LogError(exception.Message.ToString());
+            _logger.Error("Exception handled: {Title} - {StatusCode} - {Message}",
+                      errorResponse.Title, errorResponse.StatusCode, exception.Message);
 
             return true;
         }

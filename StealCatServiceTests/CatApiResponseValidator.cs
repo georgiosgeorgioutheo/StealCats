@@ -1,6 +1,5 @@
 ﻿using Application.Validations;
 using Core.DTOs;
-using FluentAssertions;
 using FluentValidation.TestHelper;
 using Xunit;
 

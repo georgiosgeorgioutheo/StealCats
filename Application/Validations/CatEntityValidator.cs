@@ -1,10 +1,6 @@
 ﻿using Core.Entities;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Application.Validations
 {
@@ -32,7 +28,7 @@ namespace Application.Validations
 
             RuleFor(cat => cat.CatTags)
                 .NotNull().WithMessage("CatTags list cannot be null.");
-            // Add further validation if you want to ensure certain properties of the tags
+           
         }
     }
 }

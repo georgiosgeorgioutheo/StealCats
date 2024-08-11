@@ -1,11 +1,6 @@
 ﻿using Core.DTOs;
 using Core.Entities;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Validations
 {
@@ -89,8 +84,6 @@ namespace Application.Validations
                 throw new InvalidOperationException("The constructed base URL is not a valid URI.");
             }
 
-            // You could add more validation logic here if needed.
-
             return Task.CompletedTask;
         }
 
@@ -106,7 +99,6 @@ namespace Application.Validations
                 throw new ArgumentException("MIME type cannot be null or empty.", nameof(mimeType));
             }
 
-            // Optionally, you could validate that the mimeType is a recognized image type.
             var validMimeTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp" };
             if (!validMimeTypes.Contains(mimeType.ToLowerInvariant()))
             {

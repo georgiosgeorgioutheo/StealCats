@@ -5,9 +5,6 @@ using Core.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
 
 
 namespace Infrastructure.Services

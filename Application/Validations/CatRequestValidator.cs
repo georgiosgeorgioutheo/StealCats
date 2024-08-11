@@ -1,9 +1,5 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Application.Validations
 {
@@ -16,7 +12,7 @@ namespace Application.Validations
 
             RuleFor(request => request.pageSize)
                 .GreaterThan(0).WithMessage("Page size must be greater than 0.")
-                .LessThanOrEqualTo(100).WithMessage("Page size must be less than or equal to 100."); // Optional limit
+                .LessThanOrEqualTo(100).WithMessage("Page size must be less than or equal to 100.");
         }
     }
 }
