@@ -73,11 +73,14 @@ namespace Infrastructure.Repositories
 
         public async Task<AddedCatsResult> AddCatsAsync(IEnumerable<CatEntity> cats)
         {
+           
+            var existingCats = await _context.Cats.ToListAsync();
+
             AddedCatsResult addedCatsResult = new AddedCatsResult();
             foreach (var cat in cats)
             {
-                var existingCat = await _context.Cats
-                    .FirstOrDefaultAsync(c => c.CatId == cat.CatId);
+                var existingCat =  existingCats
+                    .FirstOrDefault(c => c.CatId == cat.CatId);
 
                 if (existingCat == null)
                 {
