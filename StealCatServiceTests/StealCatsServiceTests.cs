@@ -6,12 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace StealCatServiceTests
 {
@@ -62,7 +58,7 @@ namespace StealCatServiceTests
                 )
             ).ToString();
 
-            // Mock the search request
+           
             _httpMessageHandlerMock.Protected()
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
@@ -75,7 +71,7 @@ namespace StealCatServiceTests
                     Content = new StringContent(responseContent)
                 });
 
-            // Mock the image download request
+           
             _httpMessageHandlerMock.Protected()
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
@@ -90,10 +86,10 @@ namespace StealCatServiceTests
 
             var catService = new StealCatApiService(_httpClient, _configuration,_validator);
 
-            // Act
+          
             var result = await catService.StealCatsAsync();
 
-            // Assert
+          
             Assert.NotNull(result);
             Assert.Single(result);
             var cat = result[0];

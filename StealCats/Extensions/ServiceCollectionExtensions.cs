@@ -39,6 +39,8 @@ namespace StealCats.Extensions
             services.AddTransient<IValidator<CatResponseDto>, CatResponseDtoValidator>();
             services.AddTransient<IValidator<CatEntity>, CatEntityValidator>();
             services.AddTransient<IValidator<(int page, int pageSize)>, CatRequestValidator>();
+            services.AddTransient<IValidator<PageResponseDto>, PageResponseDtoValidator>();
+            services.AddTransient<IValidator<PaginatedCatResponseDTO>, PaginatedCatResponseDtoValidator>();
 
             services.AddSingleton<IExceptionHandler, GlobalExceptionHandler>();
         }

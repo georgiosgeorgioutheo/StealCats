@@ -6,34 +6,51 @@ namespace Application.Validations
 {
     public static  class ValidationHelper
     {
+        private static readonly IValidator<PaginatedCatResponseDTO> _paginatedCatValidator = new PaginatedCatResponseDtoValidator();
+        private static readonly IValidator<CatEntity> _catEntityValidator = new CatEntityValidator();
+        private static readonly IValidator<CatResponseDto> _catResponseDtoValidator = new CatResponseDtoValidator();
+        private static readonly IValidator<CatApiResponse> _catApiResponseValidator = new CatApiResponseValidator();
+        private static readonly IValidator<(int page, int pageSize)> _paginationValidator = new CatRequestValidator();
+
+
+        public static async Task ValidatePaginatedCatResponseDtoAsync(PaginatedCatResponseDTO paginatedCatResponse)
+        {
+            var validationResult = await _paginatedCatValidator.ValidateAsync(paginatedCatResponse);
+
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException("PaginatedCatResponseDTO validation failed.", validationResult.Errors);
+            }
+        }
         public static async Task ValidateCatEntityAsync(CatEntity cat)
         {
-            var validator = new CatEntityValidator();
-            var validationResult =await validator.ValidateAsync(cat);
+            var validationResult = await _catEntityValidator.ValidateAsync(cat);
 
             if (!validationResult.IsValid)
             {
                 throw new ValidationException("CatEntity validation failed.", validationResult.Errors);
             }
         }
-        public static async Task ValidateCatEntities(IEnumerable<CatEntity> cats)
+
+
+        public static async Task ValidateCatEntitiesAsync(IEnumerable<CatEntity> cats)
         {
             foreach (var cat in cats)
             {
-               await ValidateCatEntityAsync(cat);
+                await ValidateCatEntityAsync(cat);
             }
         }
 
         public static async Task ValidateCatResponseDtoAsync(CatResponseDto catResponseDto)
         {
-            var validator = new CatResponseDtoValidator();
-            var validationResult = await validator.ValidateAsync(catResponseDto);
+            var validationResult = await _catResponseDtoValidator.ValidateAsync(catResponseDto);
 
             if (!validationResult.IsValid)
             {
-                throw new ValidationException("CatEntity validation failed.", validationResult.Errors);
+                throw new ValidationException("CatResponseDto validation failed.", validationResult.Errors);
             }
         }
+
         public static async Task ValidateCatResponseDtoListAsync(IEnumerable<CatResponseDto> catResponseDtos)
         {
             foreach (var catResponseDto in catResponseDtos)
@@ -44,8 +61,7 @@ namespace Application.Validations
 
         public static async Task ValidateCatApiResponseAsync(CatApiResponse catApiResponse)
         {
-            var validator = new CatApiResponseValidator();
-            var validationResult = await validator.ValidateAsync(catApiResponse);
+            var validationResult = await _catApiResponseValidator.ValidateAsync(catApiResponse);
 
             if (!validationResult.IsValid)
             {
@@ -61,10 +77,9 @@ namespace Application.Validations
             }
         }
 
-        public static async Task ValidatePaginationParameters(int page, int pageSize)
+        public static async Task ValidatePaginationParametersAsync(int page, int pageSize)
         {
-            var validator = new CatRequestValidator();
-            var validationResult = await validator.ValidateAsync((page, pageSize));
+            var validationResult = await _paginationValidator.ValidateAsync((page, pageSize));
 
             if (!validationResult.IsValid)
             {
@@ -72,7 +87,8 @@ namespace Application.Validations
             }
         }
 
-        public static  Task ValidateBaseUrlAsync(string baseUrl)
+
+        public static Task ValidateBaseUrlAsync(string baseUrl)
         {
             if (string.IsNullOrEmpty(baseUrl))
             {

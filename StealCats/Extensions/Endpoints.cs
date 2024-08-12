@@ -26,19 +26,21 @@ namespace StealCats.Extensions
             
                 app.MapGet("/api/cats", async (HttpContext httpContext, ICatRepository catRepository, int page = 1, int pageSize = 10) =>
                     {
-                        await ValidationHelper.ValidatePaginationParameters( page, pageSize); 
+                        await ValidationHelper.ValidatePaginationParametersAsync( page, pageSize); 
                         var cats = await catRepository.GetCatsAsync(page, pageSize);
-                        await ValidationHelper.ValidateCatEntities(cats);
+                        await ValidationHelper.ValidateCatEntitiesAsync(cats);
 
                         var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
                         await ValidationHelper.ValidateBaseUrlAsync(baseUrl);
 
-                        var totalPages = await catRepository.GetPageResponseDto(page,pageSize, "");
+                        var pageResponseDto = await catRepository.GetPageResponseDto(page,pageSize, "");
+
 
                         var catsResponse = cats.Select(cat => CatMappings.ToCatResponse(cat, baseUrl));
                         await ValidationHelper.ValidateCatResponseDtoListAsync(catsResponse);
-                        var response  = cats.Select(cat => CatMappings.ToPaginatedCatResponse(catsResponse, totalPages));
 
+                        var response  =  CatMappings.ToPaginatedCatResponse(catsResponse, pageResponseDto);
+                        await ValidationHelper.ValidatePaginatedCatResponseDtoAsync(response);
                         return Results.Ok(response);
                     })
                     .WithName("GetCats")
@@ -80,20 +82,23 @@ namespace StealCats.Extensions
                 app.MapGet("/api/cats/tag/{tag}", async (HttpContext httpContext, ICatRepository catRepository, string tag, int page = 1, int pageSize = 10) =>
                 {
 
-                    await ValidationHelper.ValidatePaginationParameters(page, pageSize);
+                    await ValidationHelper.ValidatePaginationParametersAsync(page, pageSize);
                     var cats = await catRepository.GetCatsByTagAsync(tag, page, pageSize);
-                    await ValidationHelper.ValidateCatEntities(cats);
+                    await ValidationHelper.ValidateCatEntitiesAsync(cats);
 
                     var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
                     await ValidationHelper.ValidateBaseUrlAsync(baseUrl);
 
-                  
 
-                    var response = cats.Select(cat => CatMappings.ToCatResponse(cat, baseUrl));
-                    await ValidationHelper.ValidateCatResponseDtoListAsync(response);
+                    var pageResponseDto = await catRepository.GetPageResponseDto(page, pageSize, tag);
+                    var catsResponse = cats.Select(cat => CatMappings.ToCatResponse(cat, baseUrl));
+                    await ValidationHelper.ValidateCatResponseDtoListAsync(catsResponse);
+
+                    var response = CatMappings.ToPaginatedCatResponse(catsResponse, pageResponseDto);
+                    await ValidationHelper.ValidatePaginatedCatResponseDtoAsync(response);
                     return Results.Ok(response);
-                  
-                   
+
+
                 })
                 .WithName("GetCatsByTag")
                 .WithTags("Cats")
@@ -109,19 +114,28 @@ namespace StealCats.Extensions
                 {
                     
                     List<CatEntity> cats = await stealCatService.StealCatsAsync();
-                    await ValidationHelper.ValidateCatEntities(cats);
+                    await ValidationHelper.ValidateCatEntitiesAsync(cats);
 
                     AddedCatsResult addedCatsResult = await catRepository.AddCatsAsync(cats);
-                     var responseMessage = new
-                     {
-                        Message = ($"Added: {addedCatsResult.AddedCount}, Updated: {addedCatsResult.UpdatedCount}")
+                    string message ="";
+                    if (addedCatsResult.UpdatedCount > 0)
+                    {
+                        message = ($"Succesfully added: {addedCatsResult.AddedCount},and updated: {addedCatsResult.UpdatedCount} cats");
+                    }
+                    else
+                    {
+                        message = ($"Succesfully added: {addedCatsResult.AddedCount} cats");
+                    }
+                    var responseMessage = new
+                    {
+                        Message = message
                     };
 
                     return Results.Ok(responseMessage);
 
                 })
                 .WithName("FetchAndStoreCats")
-                .WithTags("Cats")
+                .WithTags("StealCats")
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status400BadRequest)
                 .Produces(StatusCodes.Status500InternalServerError)
