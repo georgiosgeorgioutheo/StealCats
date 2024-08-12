@@ -20,8 +20,7 @@ public class CatResponseDtoValidator : AbstractValidator<CatResponseDto>
             .GreaterThan(0).WithMessage("Height must be greater than 0.");
 
         RuleFor(cat => cat.Created)
-            .NotEmpty().WithMessage("Created date is required.")
-            .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Created date cannot be in the future.");
+            .NotEmpty().WithMessage("Created date is required.");
 
         RuleFor(cat => cat.ImageUrl)
             .NotEmpty().WithMessage("ImageUrl is required.")

@@ -16,7 +16,7 @@ public class CatEntityValidatorTests
     [Fact]
     public void Should_Have_Error_When_CatId_Is_Empty()
     {
-        var model = new CatEntity { CatId = string.Empty, Width = 500, Height = 500, Image = new byte[] { 1, 2, 3 }, Created = DateTime.UtcNow };
+        var model = new CatEntity { CatId = string.Empty, Width = 500, Height = 500, Image = new byte[] { 1, 2, 3 }, Created = DateTime.Now };
 
         var result = _validator.TestValidate(model);
         result.ShouldHaveValidationErrorFor(cat => cat.CatId);
@@ -30,7 +30,7 @@ public class CatEntityValidatorTests
             Width = 500,
             Height = 500, 
             Image = new byte[] { 1, 2, 3 }, 
-            Created = DateTime.UtcNow.AddHours(-6) };
+            Created = DateTime.Now };
 
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(cat => cat.CatId);

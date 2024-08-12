@@ -23,8 +23,7 @@ namespace Application.Validations
                 .Must(image => image.Length > 0).WithMessage("Image cannot be empty.");
 
             RuleFor(cat => cat.Created)
-                .NotEmpty().WithMessage("Created date is required.")
-                .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Created date cannot be in the future.");
+                .NotEmpty().WithMessage("Created date is required.");
 
             RuleFor(cat => cat.CatTags)
                 .NotNull().WithMessage("CatTags list cannot be null.");

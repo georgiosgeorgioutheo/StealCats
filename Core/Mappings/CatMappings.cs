@@ -40,7 +40,7 @@ namespace Application.Mappings
                 Width = catApiResponse.Width,
                 Height = catApiResponse.Height,
                 Image = await httpClient.GetByteArrayAsync(catApiResponse.Url),
-                Created = DateTime.UtcNow,
+                Created = DateTime.Now,
                 CatTags = new List<CatTagEntity>()
             };
 
@@ -81,7 +81,7 @@ namespace Application.Mappings
                 var tagEntity = new TagEntity
                 {
                     Name = tag,
-                    Created = DateTime.UtcNow
+                    Created = DateTime.Now
                 };
                 catEntity.CatTags.Add(new CatTagEntity
                 {

@@ -125,7 +125,8 @@ namespace Infrastructure.Repositories
 
         private async Task AddNewCatAsync(CatEntity cat)
         {
-            cat.Created = DateTime.UtcNow;
+           
+            cat.Created = DateTime.Now;
 
             foreach (var catTag in cat.CatTags)
             {
