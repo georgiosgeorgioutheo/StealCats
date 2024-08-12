@@ -18,6 +18,7 @@ namespace Infrastructure.Repositories
         public async Task<IEnumerable<CatEntity>> GetCatsAsync(int page, int pageSize)
         {
             return await _context.Cats
+                .AsNoTracking()
                 .OrderBy(x => x.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -35,7 +36,7 @@ namespace Infrastructure.Repositories
                 catsQuery = catsQuery.Where(c => c.CatTags.Any(ct => ct.Tag.Name == tag));
             }
 
-           int totalCats = await catsQuery.CountAsync();
+            int totalCats = await catsQuery.CountAsync();
             pageResponseDto.TotalCount = totalCats;
 
             // Calculate the total number of pages
@@ -61,6 +62,7 @@ namespace Infrastructure.Repositories
         public async Task<IEnumerable<CatEntity>> GetCatsByTagAsync(string tag, int page, int pageSize)
         {
             return await _context.Cats
+                .AsNoTracking()
                 .Where(c => c.CatTags.Any(ct => ct.Tag.Name == tag))
                 .OrderBy(x => x.Id)
                 .Skip((page - 1) * pageSize)
