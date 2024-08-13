@@ -54,6 +54,10 @@ namespace StealCats.Extensions
 
                 app.MapGet("/api/cats/{id}", async (HttpContext httpContext, ICatRepository catRepository, int id) =>
                         {
+                            if (id <= 0)
+                            {
+                                throw new ValidationException("Id must be greater than 0");
+                            }
                             var cat = await catRepository.GetCatByIdAsync(id);
                            
                             if (cat == null)
@@ -147,6 +151,10 @@ namespace StealCats.Extensions
             // Endpoint to return an image as base64-encoded string in JSON
             app.MapGet("/api/cats/{id}/image", async (ICatRepository catRepository, int id) =>
                 {
+                    if (id <= 0)
+                    {
+                        throw new ValidationException("Id must be greater than 0");
+                    }
                     var cat = await catRepository.GetCatByIdAsync(id);
                     if (cat == null || cat.Image == null)
                     {
